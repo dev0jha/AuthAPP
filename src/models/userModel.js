@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: true,
+    required: true, 
     unique: true,
   },
   isVerified: {
@@ -32,9 +32,6 @@ const userSchema = new mongoose.Schema({
 
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);
-User.createIndexes();
-
-
 
 export default User;
 

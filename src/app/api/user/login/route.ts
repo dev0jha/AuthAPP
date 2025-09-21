@@ -4,10 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-await dbConnect();
 
 export async function POST(request: NextRequest) {
   try {
+    await dbConnect();
     const reqBody = await request.json();
     const { email, password } = reqBody;
 
@@ -19,6 +19,10 @@ export async function POST(request: NextRequest) {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });
+    }
+    const { TOKEN_SECRET } = process.env;
+    if (!TOKEN_SECRET) {
+      return NextResponse.json({ error: "Server misconfiguration: TOKEN_SECRET not set" }, { status: 500 });
     }
    // Create a JWT token
    const tokenData ={
@@ -42,6 +46,9 @@ export async function POST(request: NextRequest) {
   return response;
 
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const msg = typeof error?.message === "string" ? error.message : "Internal Server Error";
+    const isDB = (error?.name === "MongooseServerSelectionError") || /ECONNREFUSED|MongooseServerSelectionError/i.test(msg);
+    const status = isDB ? 503 : 500;
+    return NextResponse.json({ error: msg }, { status });
   }
 }
