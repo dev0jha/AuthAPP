@@ -26,7 +26,8 @@ export async function POST(request: NextRequest) {
      await sendEmail({ email: savedUser.email, emailType:"VERIFY", userId: savedUser._id });
 
     return NextResponse.json({ message: "User created successfully", success: true, savedUser });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    return NextResponse.json({ error: err?.message ?? "Internal Server Error" }, { status: 500 });
   }
 }

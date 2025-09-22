@@ -18,7 +18,7 @@ export const dbConnect = async () => {
     await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 5000,
       // heartbeatFrequencyMS: 2000, // optional tweak
-    } as any);
+    });
     console.log("Connected to MongoDB");
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);

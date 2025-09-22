@@ -45,9 +45,10 @@ export async function POST(request: NextRequest) {
   });
   return response;
 
-  } catch (error: any) {
-    const msg = typeof error?.message === "string" ? error.message : "Internal Server Error";
-    const isDB = (error?.name === "MongooseServerSelectionError") || /ECONNREFUSED|MongooseServerSelectionError/i.test(msg);
+  } catch (error: unknown) {
+    const err = error as { message?: string; name?: string };
+    const msg = typeof err?.message === "string" ? err.message : "Internal Server Error";
+    const isDB = (err?.name === "MongooseServerSelectionError") || /ECONNREFUSED|MongooseServerSelectionError/i.test(msg);
     const status = isDB ? 503 : 500;
     return NextResponse.json({ error: msg }, { status });
   }

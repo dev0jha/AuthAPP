@@ -22,13 +22,13 @@ export async function POST(request: NextRequest) {
                 status:200
             }
         );
-    } catch (error:any) {
+    } catch (error: unknown) {
+        const err = error as { message?: string };
         return NextResponse.json({
-            message:error.message ?? "Internal Server Error",
-            success:false
-        },{
-            status:500
-        }
-    );
+            message: err?.message ?? "Internal Server Error",
+            success: false
+        }, {
+            status: 500
+        });
     }
 }

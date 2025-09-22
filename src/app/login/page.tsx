@@ -10,11 +10,10 @@ import toast from "react-hot-toast";
 export default function LoginPage() {
   const router = useRouter();
   const [user, setUser] = React.useState({
-    email :"",
-    password: "",   path: "/",
-
-  })
-   const [buttonDisabled, setButtonDisabled] = React.useState(false);
+    email: "",
+    password: "",
+  });
+  const [buttonDisabled, setButtonDisabled] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
   const onLogin = async () => {
@@ -24,8 +23,9 @@ export default function LoginPage() {
       console.log("Login successful", response.data);
       toast.success("Login successful");
       router.push("/profile");
-    } catch (error: any) {
-      console.log("Login failed", error?.response?.data ?? error);
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: unknown } } | Error;
+      console.log("Login failed", (err as any)?.response?.data ?? err);
       toast.error("Login failed");
     } finally {
       setLoading(false);
@@ -61,6 +61,7 @@ useEffect(() => {
         />
         <button
         onClick={onLogin}
+        disabled={buttonDisabled || loading}
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline"
         >Login Here</button>
         <Link href="/signup">Visit SignUp Here</Link>

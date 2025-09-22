@@ -1,8 +1,7 @@
 "use client";
 import axios from "axios";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState, useCallback } from "react";
 import { toast } from "react-hot-toast";
 
 
@@ -11,17 +10,20 @@ export default function VerifyEmail() {
     const [verified, setVerified] = useState(false);
     const [error, setError] = useState(false);
  
-     const verifyUserEmail = async () => {
+     const verifyUserEmail = useCallback(async () => {
         try {
             await axios.post("/api/user/verifyEmail", { token });
             setVerified(true);
             toast.success("Email verified successfully");
-        } catch (err: any) {
+        } catch (error: unknown) {
             setError(true);
-            console.log(err?.response?.data?.message ?? "Email verification failed");
-            toast.error(err?.response?.data?.message || "Email verification failed");
+            const err = error as { response?: { data?: { message?: string } } } | Error;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            console.log((err as any)?.response?.data?.message ?? "Email verification failed");
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            toast.error((err as any)?.response?.data?.message || "Email verification failed");
         }
-    }
+    }, [token]);
 
     // Parse token from URL once on mount and set state
     useEffect(() => {
@@ -37,7 +39,7 @@ export default function VerifyEmail() {
         if (token.length > 0) {
             verifyUserEmail();
         }
-     }, [token]);
+     }, [token, verifyUserEmail]);
 
      return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">

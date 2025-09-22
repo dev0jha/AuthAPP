@@ -27,9 +27,10 @@ export default function SignUp() {
       console.log("Signup successful", response.data);
       toast.success("Account created. Please log in.");
       router.replace("/login");
-    } catch (error: any) {
-      const msg = error?.response?.data?.error || "Signup failed";
-      console.log("Signup failed", error?.response?.data ?? error);
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { error?: string } } } | Error;
+      const msg = (err as any)?.response?.data?.error || "Signup failed";
+      console.log("Signup failed", (err as any)?.response?.data ?? err);
       toast.error(msg);
     } finally {
       setLoading(false);
