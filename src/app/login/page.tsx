@@ -25,7 +25,8 @@ export default function LoginPage() {
       router.push("/profile");
     } catch (error: unknown) {
       const err = error as { response?: { data?: unknown } } | Error;
-      console.log("Login failed", (err as any)?.response?.data ?? err);
+      const data = (err as { response?: { data?: unknown } }).response?.data;
+      console.log("Login failed", data ?? err);
       toast.error("Login failed");
     } finally {
       setLoading(false);
