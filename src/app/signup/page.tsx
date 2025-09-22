@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import React, { useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 export default function SignUp() {
   const router = useRouter();
@@ -17,11 +18,19 @@ export default function SignUp() {
   const onSignUp = async () => {
     setLoading(true);
     try {
-      const response = await axios.post("/api/user/signup", user);
+      const payload = {
+        username: user.username.trim(),
+        email: user.email.trim(),
+        password: user.password,
+      };
+      const response = await axios.post("/api/user/signup", payload);
       console.log("Signup successful", response.data);
-      router.push("/login");
+      toast.success("Account created. Please log in.");
+      router.replace("/login");
     } catch (error: any) {
+      const msg = error?.response?.data?.error || "Signup failed";
       console.log("Signup failed", error?.response?.data ?? error);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -71,6 +80,7 @@ export default function SignUp() {
         placeholder="password"
       />
       <button
+        type="button"
         onClick={onSignUp}
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline"
         disabled={buttonDisabled || loading}
